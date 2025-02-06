@@ -1,0 +1,14 @@
+{
+    "name": "tidyclass",
+    "version": "0.0.1",
+    "description": "Sorts classes and methods alphabetically",
+    "main": "index.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "class"
+    ],
+    "author": "Firgrep",
+    "license": "Apache-2.0"
+}
