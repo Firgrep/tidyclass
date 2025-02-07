@@ -1,0 +1,15 @@
+class ComplexClass {
+    public rivetingFunc() {}
+    private instanceVarB = 2;
+    static private staticFuncB() {}
+    public instanceVarA = 1;
+    private funcX() {}
+    private static staticVarB = 20;
+    private static staticVarA = 10;
+    public static staticFuncAA() {}
+    static public staticVarAB = 5;
+    private funcC() {}
+    public funcA() {}
+    constructor() {}
+    static private staticFuncA() {}
+}

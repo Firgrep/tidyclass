@@ -2,13 +2,29 @@
     "name": "tidyclass",
     "version": "0.0.1",
     "description": "Sorts classes and methods alphabetically",
-    "main": "index.ts",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "bin": {
+        "tidyclass": "./dist/index.js"
     },
-    "keywords": [
-        "class"
-    ],
+    "scripts": {
+        "test": "npx vitest",
+        "build": "tsc",
+        "dev": "bun run src/index.ts"
+    },
+    "keywords": ["class", "sorting"],
     "author": "Firgrep",
-    "license": "Apache-2.0"
+    "license": "Apache-2.0",
+    "devDependencies": {
+        "@biomejs/biome": "1.9.4",
+        "@types/bun": "^1.2.2",
+        "@types/node": "^22.13.1",
+        "typescript": "^5.7.3",
+        "vitest": "^3.0.5"
+    },
+    "dependencies": {
+        "commander": "^13.1.0",
+        "fast-glob": "^3.3.3",
+        "ts-morph": "^25.0.1"
+    }
 }
