@@ -38,7 +38,7 @@ async function sortSingleFile(filePath: string) {
 program
     .version("1.0.0")
     .description(
-        "TidyClass - Sort TypeScript class members in a structured order"
+        "🧹 TidyClass - Sort TypeScript class members in a structured order"
     )
     .argument(
         "[file]",
