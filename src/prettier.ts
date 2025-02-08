@@ -12,17 +12,19 @@ function isPrettierInstalled(): boolean {
     }
 }
 
-export function formatWithPrettier(filePath: string) {
+export function formatWithPrettier(filePaths: string[]) {
     if (!isPrettierInstalled()) {
         console.warn("⚠️ Prettier is not installed. Skipping formatting.");
         return;
     }
 
-    try {
-        console.log(`✨ Running Prettier on ${filePath}`);
-        execSync(`npx prettier --write "${filePath}"`, { stdio: "inherit" });
-        console.log(`✅ Prettier formatted: ${filePath}`);
-    } catch (error) {
-        console.error("❌ Prettier formatting failed:", error);
+    for (const filePath of filePaths) {
+        try {
+            execSync(`npx prettier --write "${filePath}"`, {
+                stdio: "inherit",
+            });
+        } catch (error) {
+            console.error("❌ Prettier formatting failed:", error);
+        }
     }
 }
