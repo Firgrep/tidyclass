@@ -6,11 +6,6 @@ import { sortClassesInFiles } from "./sortClasses";
 import fs from "node:fs";
 import { formatWithPrettier } from "./prettier";
 
-main().catch((error) => {
-    console.error("❌ An unexpected error occurred:", error);
-    process.exit(1);
-});
-
 program
     .version("1.0.0")
     .description(
@@ -27,6 +22,11 @@ program
             isPrettier: options.prettier,
         });
     });
+
+main().catch((error) => {
+    console.error("❌ An unexpected error occurred:", error);
+    process.exit(1);
+});
 
 async function main() {
     await program.parseAsync(process.argv);

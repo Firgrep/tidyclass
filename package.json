@@ -1,11 +1,12 @@
 {
     "name": "tidyclass",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Sorts classes and methods alphabetically",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "files": ["dist"],
     "bin": {
-        "tidyclass": "./dist/index.js"
+        "tidyclass": "dist/index.js"
     },
     "scripts": {
         "test": "npx vitest",
