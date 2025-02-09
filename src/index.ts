@@ -40,7 +40,6 @@ async function performActions({
 
     if (isPrettier) {
         formatWithPrettier(affectedFilesPath);
-        console.info("Formatted affected files with prettier");
     }
 }
 

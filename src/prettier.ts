@@ -2,10 +2,7 @@ import { execSync } from "node:child_process";
 
 function isPrettierInstalled(): boolean {
     try {
-        // Check if Prettier exists (cross-platform)
-        const cmd =
-            process.platform === "win32" ? "where prettier" : "which prettier";
-        execSync(cmd, { stdio: "ignore" });
+        execSync("npx --no-install prettier --version", { stdio: "ignore" });
         return true;
     } catch {
         return false;

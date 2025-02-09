@@ -9,6 +9,8 @@ import {
     SyntaxKind,
 } from "ts-morph";
 
+const OVERLOADS_ERR = "Overloads are currently not supported. Aborting.";
+
 export type SortedContentsAndPath = {
     data: string;
     path: string;
@@ -66,6 +68,10 @@ function sortClasses(filePath: string): string | null {
             } else if (member.isKind(SyntaxKind.Constructor)) {
                 constructorDeclarations.push(member);
             } else if (member.isKind(SyntaxKind.MethodDeclaration)) {
+                const overloads = member.getOverloads();
+                if (overloads.length > 0) {
+                    throw new Error(OVERLOADS_ERR);
+                }
                 if (member.isStatic()) {
                     if (member.getScope() === Scope.Private) {
                         staticPrivateFuncs.push(member);
@@ -105,11 +111,9 @@ function sortClasses(filePath: string): string | null {
             ...staticPrivateVars,
             ...staticPublicFuncs,
             ...staticPrivateFuncs,
-
             ...publicVars,
             ...privateVars,
-            ...constructorDeclarations, // Constructor stays in place
-
+            ...constructorDeclarations,
             ...publicFuncs,
             ...privateFuncs,
         ];
@@ -145,9 +149,7 @@ function sortClasses(filePath: string): string | null {
                 ) {
                     classDeclaration.addMember(structure);
                 } else {
-                    throw new Error(
-                        "Detected Method or Constructor Overloads. These are not currently supported. Aborting."
-                    );
+                    throw new Error(OVERLOADS_ERR);
                 }
             }
         }

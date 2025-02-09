@@ -1,10 +1,10 @@
-# TidyClass
+# tidyclass
 
-🧹 **TidyClass** - A CLI tool to automatically sort TypeScript class members in a structured order.
+🧹 **tidyclass** - A CLI tool to automatically sort TypeScript class members in a structured order.
 
 ## Installation
 
-You can install TidyClass globally or use it as a local dependency in your project.
+You can install tidyclass globally or use it as a local dependency in your project.
 
 ```sh
 npm install -g tidyclass
@@ -18,7 +18,9 @@ npm install --save-dev tidyclass
 
 ## Usage
 
-### Sorting a Specific File
+> [!TIP]
+>
+> It's recommended to commit your work before running the script. See [Limitations](#️-limitations) below.
 
 To sort a single TypeScript file, run:
 
@@ -26,15 +28,11 @@ To sort a single TypeScript file, run:
 tidyclass path/to/file.ts
 ```
 
-### Sorting All Files in the Project
-
-If no file is specified, TidyClass will process all TypeScript files in the project:
+If no file is specified, tidyclass will process all TypeScript files in the project:
 
 ```sh
 tidyclass
 ```
-
-### Running with Prettier
 
 If you want to format the sorted files with **Prettier**, use the `-p` or `--prettier` option:
 
@@ -42,11 +40,6 @@ If you want to format the sorted files with **Prettier**, use the `-p` or `--pre
 tidyclass -p
 ```
 
-or
-
-```sh
-tidyclass --prettier
-```
 
 ## Options
 
@@ -57,43 +50,76 @@ tidyclass --prettier
 
 ## Sorting Order
 
-TidyClass organizes class members in the following structured order:
+Tidyclass organizes class members in the following structured order:
 
-- Static public variables
-- Static private variables
-- Static public methods
-- Static private methods
-- Public instance variables
-- Private instance variables
-- Constructor (remains in place)
-- Public instance methods
-- Private instance methods
+1. Static public variables
+1. Static private variables
+1. Static public methods
+1. Static private methods
+1. Public instance variables
+1. Private instance variables
+1. Constructor
+1. Public instance methods
+1. Private instance methods
 
-Each category is sorted alphabetically to ensure consistency. If the class structure changes, TidyClass updates it while maintaining logical order.
+Each category is sorted alphabetically to ensure consistency. If the class structure changes, tidyclass updates it while maintaining logical order.
 
 ## Example
 
-Before running **TidyClass**:
+Before running **tidyclass**:
 
 ```ts
-class Example {
-    private helper() {}
+class MyClass {
+    public rivetingFunc() {}
+    private instanceVarB = 2;
+    static private staticFuncB() {}
+    public instanceVarA = 1;
+    private funcX() {}
+    private static staticVarB = 20;
+    private static staticVarA = 10;
+    public static staticFuncAA() {}
+    static public staticVarAB = 5;
+    private funcC() {}
+    public funcA() {}
     constructor() {}
-    public method() {}
+    static private staticFuncA() {}
 }
 ```
 
-After running **TidyClass**:
+After running **tidyclass** (with formatting on):
 
 ```ts
-class Example {
+class MyClass {
+    public static staticVarAB = 5;
+    private static staticVarA = 10;
+    private static staticVarB = 20;
+
+    public static staticFuncAA() {}
+
+    private static staticFuncA() {}
+
+    private static staticFuncB() {}
+
+    public instanceVarA = 1;
+    private instanceVarB = 2;
+
     constructor() {}
-    public method() {}
-    private helper() {}
+
+    public funcA() {}
+
+    public rivetingFunc() {}
+
+    private funcC() {}
+
+    private funcX() {}
 }
 ```
+
+## ⚠️ Limitations
+
+- Regular single line comments are stripped. Only JSDoc `/* */` comments are preserved.
+- Overloads are currently not supported. If overloads are detected in a class, the program will abort.
 
 ## License
 
 Apache 2.0
-
