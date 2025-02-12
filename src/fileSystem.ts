@@ -45,7 +45,7 @@ async function sortSingleFile(filePath: string) {
     return sortedPaths;
 }
 
-async function getAllTsFiles(directory?: string) {
+export async function getAllTsFiles(directory?: string) {
     const pattern = directory ? [`${directory}/**/*.ts`] : ["**/*.ts"];
 
     const files = await fg(pattern, {
