@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 
-const TEST_DIR = path.join(__dirname, "test-files");
+const TEST_DIR = path.join(__dirname, "test-files-simple");
 
 beforeAll(() => {
     fs.mkdirSync(TEST_DIR, { recursive: true });

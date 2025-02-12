@@ -9,7 +9,10 @@ type ClassMemberNameAndText = {
     text: string;
     name: string;
 };
-type ClassMembersNameAndText = Array<ClassMemberNameAndText>;
+type ClassMemberNameTextOverload = ClassMemberNameAndText & {
+    overloads: ClassMemberNameAndText[];
+};
+type ClassMemberContents = Array<ClassMemberNameTextOverload>;
 
 export function sortClassesInFiles(filePaths: string[]) {
     const sortedContents: SortedContentsAndPath[] = [];
@@ -35,23 +38,24 @@ function sortClasses(filePath: string): string | null {
     const classes = sourceFile.getClasses();
 
     for (const classDeclaration of classes) {
-        const staticPublicVars: ClassMembersNameAndText = [];
-        const staticPrivateVars: ClassMembersNameAndText = [];
-        const staticPublicFuncs: ClassMembersNameAndText = [];
-        const staticPrivateFuncs: ClassMembersNameAndText = [];
-        const publicVars: ClassMembersNameAndText = [];
-        const privateVars: ClassMembersNameAndText = [];
-        const constructorDeclarations: ClassMembersNameAndText = [];
-        const publicFuncs: ClassMembersNameAndText = [];
-        const privateFuncs: ClassMembersNameAndText = [];
+        const staticPublicVars: ClassMemberContents = [];
+        const staticPrivateVars: ClassMemberContents = [];
+        const staticPublicFuncs: ClassMemberContents = [];
+        const staticPrivateFuncs: ClassMemberContents = [];
+        const publicVars: ClassMemberContents = [];
+        const privateVars: ClassMemberContents = [];
+        const constructorDeclarations: ClassMemberContents = [];
+        const publicFuncs: ClassMemberContents = [];
+        const privateFuncs: ClassMemberContents = [];
 
         const members = classDeclaration.getMembers();
 
         // Store all member information before any modifications
         for (const member of [...members]) {
-            const memberInfo = {
+            const memberInfo: ClassMemberNameTextOverload = {
                 text: member.getFullText(),
                 name: getNameCustom(member),
+                overloads: [],
             };
 
             if (member.isKind(SyntaxKind.PropertyDeclaration)) {
@@ -71,6 +75,17 @@ function sortClasses(filePath: string): string | null {
             } else if (member.isKind(SyntaxKind.Constructor)) {
                 constructorDeclarations.push(memberInfo);
             } else if (member.isKind(SyntaxKind.MethodDeclaration)) {
+                const overloads = member.getOverloads();
+
+                // Handle any overloads as part of the method
+                for (const overload of overloads) {
+                    const overloadContent = {
+                        text: overload.getFullText(),
+                        name: getNameCustom(overload),
+                    };
+                    memberInfo.overloads.push(overloadContent);
+                }
+
                 if (member.isStatic()) {
                     if (member.getScope() === Scope.Private) {
                         staticPrivateFuncs.push(memberInfo);
@@ -113,9 +128,10 @@ function sortClasses(filePath: string): string | null {
         // If the order has changed, update the file
         const currentOrder = members.map((m) => getNameCustom(m));
         const newOrder = sortedMembers.map((m) => m.name);
+
         if (JSON.stringify(currentOrder) !== JSON.stringify(newOrder)) {
             console.info(
-                `Sorting members in class: ${classDeclaration.getName()}`
+                `⚙️ Sorting members in class: ${classDeclaration.getName()}`
             );
             modified = true;
 
@@ -127,6 +143,9 @@ function sortClasses(filePath: string): string | null {
             // Add sorted members back
             let newClassStructure = "";
             for (const sortedMember of sortedMembers) {
+                for (const overload of sortedMember.overloads) {
+                    newClassStructure += `${overload.text}\n\n`;
+                }
                 newClassStructure += `${sortedMember.text}\n\n`;
             }
             classDeclaration.addMembers(newClassStructure);

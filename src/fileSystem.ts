@@ -33,7 +33,7 @@ async function sortSingleFile(filePath: string) {
     const sortedContents = sortClassesInFiles([filePath]);
 
     if (sortedContents.length === 0) {
-        console.info("✔ No changes needed.");
+        console.info("◽ No changes needed.");
         return [];
     }
 

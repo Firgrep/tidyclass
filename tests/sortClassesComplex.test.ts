@@ -8,24 +8,45 @@ const TEST_DIR = path.join(__dirname, "test-files");
 beforeAll(() => {
     fs.mkdirSync(TEST_DIR, { recursive: true });
 
-    // Create a more complex unsorted test file
+    // Create test file with the new class structure including overloads
     fs.writeFileSync(
         path.join(TEST_DIR, "complex.ts"),
         `
-        class ComplexClass {
+        class MyClass {
             public rivetingFunc() {}
             private instanceVarB = 2;
-            static private staticFuncB() {}
+            private static staticFuncB() {}
             public instanceVarA = 1;
             private funcX() {}
             private static staticVarB = 20;
             private static staticVarA = 10;
-            public static staticFuncA() {}
-            static public staticVarA = 5;
+            public static staticFuncAA() {}
+            public static staticVarAB = 5;
             private funcC() {}
             public funcA() {}
             constructor() {}
-            static private staticFuncA() {}
+            private static  staticFuncA() {}
+
+            public process(data: string): string;
+            public process(data: number): number;
+            public process(data: boolean): boolean;
+            public process(data: any): any {
+                return data;
+            }
+        
+            /**
+             * Logging
+             * @param message 
+             * @param level 
+             */
+            log(message: string): void;
+            log(message: string, level: "info" | "warn" | "error"): void;
+            log(message: string, level: "info" | "warn" | "error" = "info"): void {
+                /**
+                 * Hello log
+                 */
+                console.log(\`[\${level.toUpperCase()}] \${message}\`); // Some comment
+            }
         }
         `
     );
@@ -36,7 +57,7 @@ afterAll(() => {
 });
 
 describe("sortClassesInFiles (Complex Case)", () => {
-    it("should correctly sort static members first, then variables, constructor, and methods", () => {
+    it("should correctly sort members with proper spacing and maintain comments", () => {
         const filePaths = [path.join(TEST_DIR, "complex.ts")];
 
         // Run sorting
@@ -46,43 +67,81 @@ describe("sortClassesInFiles (Complex Case)", () => {
         expect(sortedResults).toHaveLength(1);
         expect(sortedResults[0].path).toBe(filePaths[0]);
 
-        // Verify that the sorted output respects the correct ordering
         const updatedCode = sortedResults[0].data;
 
-        // Ensure static variables appear before static functions
-        expect(updatedCode.indexOf("staticVarA")).toBeLessThan(
-            updatedCode.indexOf("staticFuncA")
-        );
-        expect(updatedCode.indexOf("staticVarB")).toBeLessThan(
-            updatedCode.indexOf("staticFuncB")
-        );
+        // Check static members ordering using full declarations
+        expect(
+            updatedCode.indexOf("public static staticVarAB = 5")
+        ).toBeLessThan(updatedCode.indexOf("private static staticVarA = 10"));
+        expect(
+            updatedCode.indexOf("private static staticVarA = 10")
+        ).toBeLessThan(updatedCode.indexOf("private static staticVarB = 20"));
+        expect(
+            updatedCode.indexOf("private static staticVarB = 20")
+        ).toBeLessThan(updatedCode.indexOf("public static staticFuncAA()"));
+        expect(
+            updatedCode.indexOf("public static staticFuncAA()")
+        ).toBeLessThan(updatedCode.indexOf("private static  staticFuncA()"));
+        expect(
+            updatedCode.indexOf("private static  staticFuncA()")
+        ).toBeLessThan(updatedCode.indexOf("private static staticFuncB()"));
 
-        // Ensure public static variables come before private static variables
-        expect(updatedCode.indexOf("staticVarA")).toBeLessThan(
-            updatedCode.indexOf("staticVarB")
+        // Check instance variables
+        expect(updatedCode.indexOf("public instanceVarA = 1")).toBeLessThan(
+            updatedCode.indexOf("private instanceVarB = 2")
         );
-
-        // Ensure public static functions come before private static functions
-        expect(updatedCode.indexOf("staticFuncA")).toBeLessThan(
-            updatedCode.indexOf("staticFuncB")
-        );
-
-        // Ensure instance variables appear before the constructor
-        expect(updatedCode.indexOf("instanceVarA")).toBeLessThan(
+        expect(updatedCode.indexOf("private instanceVarB = 2")).toBeLessThan(
             updatedCode.indexOf("constructor()")
         );
-        expect(updatedCode.indexOf("instanceVarB")).toBeLessThan(
-            updatedCode.indexOf("constructor()")
-        );
 
-        // Ensure constructor appears before methods
+        // Check methods ordering, including overloads
         expect(updatedCode.indexOf("constructor()")).toBeLessThan(
-            updatedCode.indexOf("funcA")
+            updatedCode.indexOf("public funcA()")
+        );
+        expect(updatedCode.indexOf("public funcA()")).toBeLessThan(
+            updatedCode.indexOf("log(message: string): void;")
         );
 
-        // Ensure public instance methods come before private instance methods
-        expect(updatedCode.indexOf("funcA")).toBeLessThan(
-            updatedCode.indexOf("funcC")
+        // Check that overloads stay together and in order
+        expect(
+            updatedCode.indexOf("public process(data: string): string;")
+        ).toBeLessThan(
+            updatedCode.indexOf("public process(data: number): number;")
         );
+        expect(
+            updatedCode.indexOf("public process(data: number): number;")
+        ).toBeLessThan(
+            updatedCode.indexOf("public process(data: boolean): boolean;")
+        );
+        expect(
+            updatedCode.indexOf("public process(data: boolean): boolean;")
+        ).toBeLessThan(updatedCode.indexOf("public process(data: any): any {"));
+
+        expect(updatedCode.indexOf("log(message: string): void;")).toBeLessThan(
+            updatedCode.indexOf(
+                'log(message: string, level: "info" | "warn" | "error"): void;'
+            )
+        );
+        expect(
+            updatedCode.indexOf(
+                'log(message: string, level: "info" | "warn" | "error"): void;'
+            )
+        ).toBeLessThan(
+            updatedCode.indexOf(
+                'log(message: string, level: "info" | "warn" | "error" = "info"): void {'
+            )
+        );
+
+        expect(updatedCode.indexOf("public rivetingFunc()")).toBeLessThan(
+            updatedCode.indexOf("private funcC()")
+        );
+        expect(updatedCode.indexOf("private funcC()")).toBeLessThan(
+            updatedCode.indexOf("private funcX()")
+        );
+
+        // Verify comments are preserved
+        expect(updatedCode).toContain("* Logging");
+        expect(updatedCode).toContain("* Hello log");
+        expect(updatedCode).toContain("// Some comment");
     });
 });
