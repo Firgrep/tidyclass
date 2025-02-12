@@ -54,6 +54,12 @@ export async function getAllTsFiles(directory?: string) {
             "dist/**",
             "coverage/**",
             ".next/**",
+            "out/**",
+            "build/**",
+            "tmp/**",
+            "temp/**",
+            "test/**",
+            "tests/**",
             "**/*.d.ts",
         ],
     });
