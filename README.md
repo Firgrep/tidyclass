@@ -20,7 +20,7 @@ npm install --save-dev tidyclass
 
 > [!TIP]
 >
-> It's recommended to commit your work before running the script. See [Limitations](#️-limitations) below.
+> It's recommended to commit your work before running the script.
 
 To sort a single TypeScript file, run:
 
@@ -114,11 +114,6 @@ class MyClass {
     private funcX() {}
 }
 ```
-
-## ⚠️ Limitations
-
-- Regular single line comments are stripped. Only JSDoc `/* */` comments are preserved.
-- Overloads are currently not supported. If overloads are detected in a class, the program will abort.
 
 ## License
 
