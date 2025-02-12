@@ -51,3 +51,4 @@ gha-creds-*.json
 
 target/
 _pagefind/
+prototype.ts

@@ -1,20 +1,15 @@
-import {
-    type ClassMemberTypes,
-    type ConstructorDeclaration,
-    type MethodDeclaration,
-    Project,
-    type PropertyDeclaration,
-    Scope,
-    StructureKind,
-    SyntaxKind,
-} from "ts-morph";
-
-const OVERLOADS_ERR = "Overloads are currently not supported. Aborting.";
+import { type ClassMemberTypes, Project, Scope, SyntaxKind } from "ts-morph";
 
 export type SortedContentsAndPath = {
     data: string;
     path: string;
 };
+
+type ClassMemberNameAndText = {
+    text: string;
+    name: string;
+};
+type ClassMembersNameAndText = Array<ClassMemberNameAndText>;
 
 export function sortClassesInFiles(filePaths: string[]) {
     const sortedContents: SortedContentsAndPath[] = [];
@@ -40,70 +35,67 @@ function sortClasses(filePath: string): string | null {
     const classes = sourceFile.getClasses();
 
     for (const classDeclaration of classes) {
-        const staticPublicVars: PropertyDeclaration[] = [];
-        const staticPrivateVars: PropertyDeclaration[] = [];
-        const staticPublicFuncs: MethodDeclaration[] = [];
-        const staticPrivateFuncs: MethodDeclaration[] = [];
-        const publicVars: PropertyDeclaration[] = [];
-        const privateVars: PropertyDeclaration[] = [];
-        const constructorDeclarations: ConstructorDeclaration[] = [];
-        const publicFuncs: MethodDeclaration[] = [];
-        const privateFuncs: MethodDeclaration[] = [];
+        const staticPublicVars: ClassMembersNameAndText = [];
+        const staticPrivateVars: ClassMembersNameAndText = [];
+        const staticPublicFuncs: ClassMembersNameAndText = [];
+        const staticPrivateFuncs: ClassMembersNameAndText = [];
+        const publicVars: ClassMembersNameAndText = [];
+        const privateVars: ClassMembersNameAndText = [];
+        const constructorDeclarations: ClassMembersNameAndText = [];
+        const publicFuncs: ClassMembersNameAndText = [];
+        const privateFuncs: ClassMembersNameAndText = [];
 
-        for (const member of classDeclaration.getMembers()) {
+        const members = classDeclaration.getMembers();
+
+        // Store all member information before any modifications
+        for (const member of [...members]) {
+            const memberInfo = {
+                text: member.getFullText(),
+                name: getNameCustom(member),
+            };
+
             if (member.isKind(SyntaxKind.PropertyDeclaration)) {
                 if (member.isStatic()) {
                     if (member.getScope() === Scope.Private) {
-                        staticPrivateVars.push(member);
+                        staticPrivateVars.push(memberInfo);
                     } else {
-                        staticPublicVars.push(member);
+                        staticPublicVars.push(memberInfo);
                     }
                 } else {
                     if (member.getScope() === Scope.Private) {
-                        privateVars.push(member);
+                        privateVars.push(memberInfo);
                     } else {
-                        publicVars.push(member);
+                        publicVars.push(memberInfo);
                     }
                 }
             } else if (member.isKind(SyntaxKind.Constructor)) {
-                constructorDeclarations.push(member);
+                constructorDeclarations.push(memberInfo);
             } else if (member.isKind(SyntaxKind.MethodDeclaration)) {
-                const overloads = member.getOverloads();
-                if (overloads.length > 0) {
-                    throw new Error(OVERLOADS_ERR);
-                }
                 if (member.isStatic()) {
                     if (member.getScope() === Scope.Private) {
-                        staticPrivateFuncs.push(member);
+                        staticPrivateFuncs.push(memberInfo);
                     } else {
-                        staticPublicFuncs.push(member);
+                        staticPublicFuncs.push(memberInfo);
                     }
                 } else {
                     if (member.getScope() === Scope.Private) {
-                        privateFuncs.push(member);
+                        privateFuncs.push(memberInfo);
                     } else {
-                        publicFuncs.push(member);
+                        publicFuncs.push(memberInfo);
                     }
                 }
             }
         }
 
         // Sort members alphabetically within their groups
-        staticPublicVars.sort((a, b) => a.getName().localeCompare(b.getName()));
-        staticPrivateVars.sort((a, b) =>
-            a.getName().localeCompare(b.getName())
-        );
-        staticPublicFuncs.sort((a, b) =>
-            a.getName().localeCompare(b.getName())
-        );
-        staticPrivateFuncs.sort((a, b) =>
-            a.getName().localeCompare(b.getName())
-        );
-
-        publicVars.sort((a, b) => a.getName().localeCompare(b.getName()));
-        privateVars.sort((a, b) => a.getName().localeCompare(b.getName()));
-        publicFuncs.sort((a, b) => a.getName().localeCompare(b.getName()));
-        privateFuncs.sort((a, b) => a.getName().localeCompare(b.getName()));
+        staticPublicVars.sort((a, b) => a.name.localeCompare(b.name));
+        staticPrivateVars.sort((a, b) => a.name.localeCompare(b.name));
+        staticPublicFuncs.sort((a, b) => a.name.localeCompare(b.name));
+        staticPrivateFuncs.sort((a, b) => a.name.localeCompare(b.name));
+        publicVars.sort((a, b) => a.name.localeCompare(b.name));
+        privateVars.sort((a, b) => a.name.localeCompare(b.name));
+        publicFuncs.sort((a, b) => a.name.localeCompare(b.name));
+        privateFuncs.sort((a, b) => a.name.localeCompare(b.name));
 
         // Combine everything in the correct order
         const sortedMembers = [
@@ -119,20 +111,13 @@ function sortClasses(filePath: string): string | null {
         ];
 
         // If the order has changed, update the file
-        if (
-            JSON.stringify(
-                classDeclaration.getMembers().map((m) => getNameCustom(m))
-            ) !== JSON.stringify(sortedMembers.map((m) => getNameCustom(m)))
-        ) {
+        const currentOrder = members.map((m) => getNameCustom(m));
+        const newOrder = sortedMembers.map((m) => m.name);
+        if (JSON.stringify(currentOrder) !== JSON.stringify(newOrder)) {
             console.info(
                 `Sorting members in class: ${classDeclaration.getName()}`
             );
             modified = true;
-
-            // Get structures before removing
-            const sortedStructures = sortedMembers.map((member) =>
-                member.getStructure()
-            );
 
             // Remove old members
             for (const member of classDeclaration.getMembers()) {
@@ -140,18 +125,11 @@ function sortClasses(filePath: string): string | null {
             }
 
             // Add sorted members back
-            for (const structure of sortedStructures) {
-                if (structure.kind === StructureKind.Constructor) {
-                    classDeclaration.addConstructor(structure);
-                } else if (
-                    structure.kind !== StructureKind.MethodOverload &&
-                    structure.kind !== StructureKind.ConstructorOverload
-                ) {
-                    classDeclaration.addMember(structure);
-                } else {
-                    throw new Error(OVERLOADS_ERR);
-                }
+            let newClassStructure = "";
+            for (const sortedMember of sortedMembers) {
+                newClassStructure += `${sortedMember.text}\n\n`;
             }
+            classDeclaration.addMembers(newClassStructure);
         }
     }
 
