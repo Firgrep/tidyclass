@@ -22,34 +22,26 @@ npm install --save-dev tidyclass
 >
 > It's recommended to commit your work before running the script.
 
+> [!INFO]
+>
+> If you installed locally to your project, use `npx tidyclass`.
+
 To sort a single TypeScript file, run:
 
 ```sh
 tidyclass path/to/file.ts
-
-# Or, if you installed locally in your project
-
-npx tidyclass path/to/file.ts
 ```
 
 If no file is specified, tidyclass will process all TypeScript files in the project:
 
 ```sh
 tidyclass
-
-# Or, if you installed locally in your project
-
-npx tidyclass
 ```
 
 If you want to format the sorted files with **Prettier**, use the `-p` or `--prettier` option:
 
 ```sh
 tidyclass -p
-
-# Or, if you installed locally in your project
-
-npx tidyclass -p
 ```
 
 
