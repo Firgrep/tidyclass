@@ -22,7 +22,7 @@ npm install --save-dev tidyclass
 >
 > It's recommended to commit your work before running the script.
 
-> [!INFO]
+> [!NOTE]
 >
 > If you installed locally to your project, use `npx tidyclass`.
 
