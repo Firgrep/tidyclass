@@ -3,7 +3,7 @@ name: Publish to NPM 🚀
 on:
     workflow_dispatch:
     release:
-        types: [created, edited]
+        types: [created]
 
 jobs:
     build-and-publish:
