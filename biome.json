@@ -3,7 +3,13 @@
     "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
     "files": {
         "ignoreUnknown": false,
-        "ignore": ["dist", "node_modules", "example.ts", "prototype.ts"]
+        "ignore": [
+            "dist",
+            "node_modules",
+            "example.ts",
+            "prototype.ts",
+            "example_clean.ts"
+        ]
     },
     "formatter": {
         "enabled": true,

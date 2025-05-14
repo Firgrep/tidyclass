@@ -1,6 +1,6 @@
 {
     "name": "tidyclass",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "Sorts classes and methods alphabetically",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -11,7 +11,8 @@
     "scripts": {
         "test": "npx vitest",
         "build": "tsc",
-        "dev": "bun run src/index.ts"
+        "dev": "bun run src/index.ts",
+        "dev:test": "bun run src/index.ts example.ts"
     },
     "keywords": ["class", "sorting"],
     "author": "Firgrep",

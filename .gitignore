@@ -8,6 +8,7 @@
 # testing
 /coverage
 example.ts
+example_clean.ts
 
 # next.js
 /.next/
