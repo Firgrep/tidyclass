@@ -14,6 +14,11 @@ type ClassMemberNameTextOverload = ClassMemberNameAndText & {
 };
 type ClassMemberContents = Array<ClassMemberNameTextOverload>;
 
+const JSDOC_TAG_INTERNAL_SORT = "internal_sort";
+const JSDOC_TAG_INTERNAL_SORT_OPS = {
+    skip: "skip",
+};
+
 export function sortClassesInFiles(filePaths: string[]) {
     const sortedContents: SortedContentsAndPath[] = [];
     for (const filePath of filePaths) {
@@ -38,6 +43,22 @@ function sortClasses(filePath: string): string | null {
     const classes = sourceFile.getClasses();
 
     for (const classDeclaration of classes) {
+        const jsDocTags = classDeclaration
+            .getJsDocs()
+            .flatMap((jsdoc) => jsdoc.getTags());
+        const shouldSkip = jsDocTags.some(
+            (tag) =>
+                tag.getTagName() === JSDOC_TAG_INTERNAL_SORT &&
+                String(tag.getComment())?.includes(
+                    JSDOC_TAG_INTERNAL_SORT_OPS.skip
+                )
+        );
+
+        if (shouldSkip) {
+            console.info(`🚫 Skipping class: ${classDeclaration.getName()}`);
+            continue;
+        }
+
         const staticPublicVars: ClassMemberContents = [];
         const staticPrivateVars: ClassMemberContents = [];
         const staticPublicFuncs: ClassMemberContents = [];

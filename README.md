@@ -47,7 +47,16 @@ tidyclass -p
 
 ## Options
 
-| Option           | Description                                                   |
+**Opt classes out**: To opt certain classes out of the member sorting, add the following JSDoc comment to the class.
+
+```ts
+/**
+ * @internal_sort skip
+ */
+class ThisClassWillNotBeSorted
+```
+
+| CLI Option           | Description                                                   |
 |-----------------|---------------------------------------------------------------|
 | `-p, --prettier` | Run Prettier on affected files after sorting    |    
          
