@@ -58,7 +58,8 @@ class ThisClassWillNotBeSorted
 
 | CLI Option           | Description                                                   |
 |-----------------|---------------------------------------------------------------|
-| `-p, --prettier` | Run Prettier on affected files after sorting    |    
+| `-b, --biome` | Run Biome formatting on affected files after sorting    |    
+| `-p, --prettier` | Run Prettier formatting on affected files after sorting    |    
          
 
 ## Sorting Order
