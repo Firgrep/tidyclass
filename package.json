@@ -1,6 +1,6 @@
 {
     "name": "tidyclass",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "Sorts classes and methods alphabetically",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
