@@ -3,7 +3,7 @@
 import { program } from "commander";
 import { handleFiles } from "./fileSystem";
 import fs from "node:fs";
-import { formatWithPrettier } from "./prettier";
+import { formatWithBiome, formatWithPrettier } from "./format";
 
 const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf-8"));
 
@@ -16,11 +16,19 @@ program
         "[file]",
         "File path to sort (optional). If not provided, sorts all files in the project."
     )
-    .option("-p, --prettier", "Run Prettier on affected files after sorting")
+    .option(
+        "-p, --prettier",
+        "Run Prettier formatting on affected files after sorting"
+    )
+    .option(
+        "-b, --biome",
+        "Run Biome formatting on affected files after sorting"
+    )
     .action(async (file, options) => {
         await performActions({
             file,
             isPrettier: options.prettier,
+            isBiome: options.biome,
         });
     });
 
@@ -36,10 +44,15 @@ async function main() {
 async function performActions({
     file,
     isPrettier = false,
-}: { file: string | undefined; isPrettier: boolean }) {
+    isBiome = false,
+}: { file: string | undefined; isPrettier: boolean; isBiome: boolean }) {
     const affectedFilesPath = await handleFiles(file);
 
     if (isPrettier) {
         formatWithPrettier(affectedFilesPath);
+    }
+
+    if (isBiome) {
+        formatWithBiome(affectedFilesPath);
     }
 }
