@@ -38,10 +38,10 @@ If no file is specified, tidyclass will process all TypeScript files in the proj
 tidyclass
 ```
 
-If you want to format the sorted files with **Prettier**, use the `-p` or `--prettier` option:
+If you want to format the sorted files with **Biome**, use `-b` or `--biome` option, or with **Prettier**, use the `-p` or `--prettier` option:
 
 ```sh
-tidyclass -p
+tidyclass -b
 ```
 
 
